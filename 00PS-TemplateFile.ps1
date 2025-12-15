@@ -13,10 +13,10 @@
 function New-PSTemplateFile {
     param (
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]$FileName,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]$DestinationPath,
 
         [ValidateSet($true, $false)]
@@ -31,11 +31,16 @@ function New-PSTemplateFile {
 
     # Add the header to the file if specified
     if ($AddHeader) {
-        $author = Get-LocalUser $env:USERNAME | Select-Object -ExpandProperty FullName
-        $projectName = "New PowerShell Project"
+        $author = try {
+            Get-LocalUser $env:USERNAME | Select-Object -ExpandProperty FullName
+        }
+        catch {
+            [System.Security.Principal.WindowsIdentity]::GetCurrent().Name -replace '^.*\\', ''
+        } 
+        $projectName = $createdFile.Name -replace '\.ps1$', ''
         $version = "v1.0.0"
-        $filePath    = $createdFile.FullName
-        $fileName    = $createdFile.Name
+        $filePath = $createdFile.FullName
+        $fileName = $createdFile.Name
         $createdDate = $createdFile.CreationTime.ToString("yyyy-MM-dd")
         $lastUpdated = (Get-Date).ToString("yyyy-MM-dd")
 
@@ -77,10 +82,10 @@ function New-PSTemplateFile {
 # Main Script Logic
 "@
 
-# Add the body text to the file
-Add-Content -Path $createdFile.FullName -Value $bodyText
+    # Add the body text to the file
+    Add-Content -Path $createdFile.FullName -Value $bodyText
 
-# Write Output
-Write-Host "Template file '$FileName' created at '$DestinationPath'." -ForegroundColor Green
+    # Write Output
+    Write-Host "Template file '$FileName' created at '$DestinationPath'." -ForegroundColor Green
 
 }
