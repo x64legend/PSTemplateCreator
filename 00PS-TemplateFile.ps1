@@ -143,3 +143,4 @@ switch ($openFile) {
         Write-Host "Not opening the file."
     }
 }
+
